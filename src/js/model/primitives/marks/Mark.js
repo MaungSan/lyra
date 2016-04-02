@@ -10,6 +10,7 @@ var dl = require('datalib'),
     propSg = require('../../../util/prop-signal'),
     model = require('../../'),
     lookup = model.lookup,
+    ns = require('../../../util/ns'),
     counter = require('../../../util/counter');
 
 /**
