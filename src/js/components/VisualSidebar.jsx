@@ -8,8 +8,6 @@ var VisualSidebar = React.createClass({
   classNames: 'sidebar col4 lt-blue-bg',
   getInitialState: function() {
     return {
-      selected: model.Scene._id,
-      expandedLayers: {},
       classes: 'col2'
     };
   },
