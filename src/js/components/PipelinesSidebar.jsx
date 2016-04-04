@@ -5,12 +5,6 @@ var React = require('react'),
 
 var PipelineSidebar = React.createClass({
   classNames: 'sidebar col5 push9 pipeline-grid-break dk-blue-bg',
-  getInitialState: function() {
-    return {
-      selected: model.Scene._id,
-      expandedLayers: {}
-    };
-  },
 
   render: function() {
     var pipelines = model.pipeline();
