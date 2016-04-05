@@ -34,6 +34,10 @@ function inspectorReducer(state, action) {
     return state.set('selected', action.markId);
   }
 
+  if (action.type === actions.PRIMITIVE_ADD_MARK) {
+    return state.set('selected', action._id);
+  }
+
   if (action.type === actions.EXPAND_LAYERS) {
     return action.layerIds.reduce(function(newState, layerId) {
       return setIn(newState, 'expandedLayers.' + layerId, true);

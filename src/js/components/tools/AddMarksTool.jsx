@@ -3,13 +3,20 @@ var React = require('react'),
     connect = require('react-redux').connect,
     getIn = require('../../util/immutable-utils').getIn,
     model = require('../../model'),
+    marks = require('../../model/primitives/marks'),
     lookup = model.lookup,
+    getClosestGroupId = require('../../util/hierarchy').getClosestGroupId,
+    addMark = require('../../actions/primitiveActions').addMark,
     selectMark = require('../../actions/selectMark');
 
 function mapStateToProps(reduxState, ownProps) {
   var selectedMarkId = getIn(reduxState, 'inspector.selected');
+  var sceneId = getIn(reduxState, 'scene.id');
+  var closestGroupId = selectedMarkId ? getClosestGroupId(reduxState, selectedMarkId) : sceneId;
+  console.log(closestGroupId);
 
   return {
+    closestGroupId: closestGroupId,
     selected: selectedMarkId
   };
 }
@@ -18,6 +25,11 @@ function mapDispatchToProps(dispatch) {
   return {
     selectMark: function(id) {
       dispatch(selectMark(id));
+    },
+    addMark: function(parentId, type) {
+      dispatch(addMark(marks(type).defaultProperties({
+        _parent: parentId
+      })));
     }
   };
 }
@@ -28,34 +40,17 @@ var AddMarksTool = connect(
   mapDispatchToProps
 )(React.createClass({
   classNames: 'new Marks',
-  getCurrentGroup: function(){
-    // ghetto: will be replaced with utility to find parents
-    var selected = lookup(this.props.selected);
-    if (selected && selected.type == 'group'){
-      return selected;
-    } else if (selected) {
-      var parent = lookup(selected._parent);
-      if (parent.type == 'group') {
-        return parent;
-      }
-    }
-  },
-  addMark: function(type) {
-    var scene = this.getCurrentGroup() || model.Scene;
-    var newMark = scene.child('marks.' + type);
-    // Auto-select the newly added mark
-    // (There is no race condition here because the addition of a mark will
-    // have already dispatched a Vega re-render request)
-    this.props.selectMark(newMark._id);
-  },
+
   render: function() {
+    var parentId = this.props.closestGroupId;
+
     return (
       <ul className={this.classNames}>
-        <li onClick={this.addMark.bind(null, 'rect')} >RECT</li>
-        <li onClick={this.addMark.bind(null, 'symbol')}>SYMBOL</li>
-        <li onClick={this.addMark.bind(null, 'area')}>AREA</li>
-        <li onClick={this.addMark.bind(null, 'line')}>LINE</li>
-        <li onClick={this.addMark.bind(null, 'text')}>TEXT</li>
+        <li onClick={this.props.addMark.bind(null, parentId, 'rect')} >RECT</li>
+        <li onClick={this.props.addMark.bind(null, parentId, 'symbol')}>SYMBOL</li>
+        <li onClick={this.props.addMark.bind(null, parentId, 'area')}>AREA</li>
+        <li onClick={this.props.addMark.bind(null, parentId, 'line')}>LINE</li>
+        <li onClick={this.props.addMark.bind(null, parentId, 'text')}>TEXT</li>
       </ul>
     );
   }

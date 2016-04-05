@@ -49,36 +49,13 @@ model.mark = function(id, props) {
     return model;
   }
 
-  var Area = require('./primitives/marks/Area'),
-      Group = require('./primitives/marks/Group'),
-      Line = require('./primitives/marks/Line'),
-      Rect = require('./primitives/marks/Rect'),
-      Scene = require('./primitives/marks/Scene'),
-      Symbol = require('./primitives/marks/Symbol'),
-      Text = require('./primitives/marks/Text');
+  var Ctor = require('./primitives/marks')(props.type);
 
-  switch (props.type) {
-    case 'area':
-      return model.primitive(id, new Area(props));
-    case 'group':
-      return model.primitive(id, new Group(props));
-    case 'line':
-      return model.primitive(id, new Line(props));
-    case 'rect':
-      return model.primitive(id, new Rect(props));
-    case 'scene':
-      // If we have more than one of these something is wrong, but we need to
-      // account for it the same as any other mark so that we can recreate the
-      // entire primitives dictionary at will
-      return model.primitive(id, new Scene(props));
-    case 'symbol':
-      return model.primitive(id, new Symbol(props));
-    case 'text':
-      return model.primitive(id, new Text(props));
-    default:
-      console.warn('unrecognized type "' + type + '"');
-      return model;
+  if (Ctor) {
+    return model.primitive(id, new Ctor(props));
   }
+  console.warn('unrecognized type "' + props.type + '"');
+  return model;
 }
 
 /**

@@ -1,5 +1,7 @@
 'use strict';
 
+var getIn = require('./immutable-utils').getIn;
+
 /**
  * Find the parent item for a given mark.
  *
@@ -9,6 +11,14 @@
 function getParent(mark) {
   // Require model in here to sidestep circular dependency issue
   return require('../model').lookup(mark._parent) || null;
+}
+
+function getClosestGroupId(store, id) {
+  var mark = getIn(store, 'primitives.' + id);
+  if (mark && mark.type === 'group') {
+    return mark._id;
+  }
+  return mark ? mark._parent : null;
 }
 
 /**
@@ -121,6 +131,7 @@ function findInItemTree(item, path) {
 
 module.exports = {
   getParent: getParent,
+  getClosestGroupId: getClosestGroupId,
   getChildren: getChildren,
   getParentGroupIds: getParentGroupIds,
   getParents: getParents,
