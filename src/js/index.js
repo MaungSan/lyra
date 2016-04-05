@@ -16,7 +16,6 @@ var reparse = require('./actions/vegaInvalidate');
 
 // Initialize the Model.
 var model = require('./model');
-model.init();
 
 // Set up the listeners that connect the model to the store
 var listeners = require('./store/listeners');
@@ -31,27 +30,21 @@ store.subscribe(listeners.createStoreListener(store, model));
 // (16 is derived from 1000ms / 60fps)
 store.subscribe(throttle(model.update, 16));
 
-// Initialize components
-var ui = require('./components');
+// Initializes the Lyra model with a new Scene primitive.
+var createScene = require('./actions/createScene');
+store.dispatch(createScene());
 
-var g = model.Scene.child('marks.group'),
-    g2 = model.Scene.child('marks.group'),
-    p = model.pipeline('cars'),
+var p = model.pipeline('cars'),
     p2 = model.pipeline('jobs'),
     p3 = model.pipeline('gapminder');
-
-// Pre-populate state with one rect, one symbol, one text & one line mark
-g2.child('marks.line');
-// g2.child('marks.symbol');
-// g2.child('marks.line');
-// g2.child('marks.text');
-// g.child('marks.area');
 
 Promise.all([
   p._source.init({url: '/data/cars.json'}),
   p2._source.init({url: '/data/jobs.json'}),
   p3._source.init({url: '/data/gapminder.json'})
 ]).then(function() {
+  // Initialize components
+  var ui = require('./components');
   ui.forceUpdate(function() {
     // Parse the model to initialize and render the Vega view
     store.dispatch(reparse(true));

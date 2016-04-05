@@ -114,3 +114,4 @@ api.streams = function(name, def) {
 };
 
 module.exports = api;
+window.sg = api;
